@@ -6,7 +6,7 @@ import { TransformInterceptor } from './core/transform.interceptor'
 import passport from 'passport';
 import { ConfigService } from '@nestjs/config';
 import cookieParser from 'cookie-parser';
-
+declare const module: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -26,5 +26,9 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService)
   await app.listen(process.env.PORT);
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
 }
 bootstrap();

@@ -32,10 +32,10 @@ export class Product {
     @Prop({ type: Map, of: String })
     attributes: Record<string, any>;
 
-    @Prop()
+    @Prop({ default: Date.now })
     createdAt: Date
 
-    @Prop()
+    @Prop({ default: Date.now })
     updatedAt: Date
 
     @Prop()

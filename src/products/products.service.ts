@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductDocument, ProductSchema } from './schemas/product.schemas';
@@ -6,13 +6,19 @@ import { InjectModel } from '@nestjs/mongoose';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/user.interface';
 import aqp from 'api-query-params';
+import { isValidObjectId } from 'mongoose';
 
 @Injectable()
 export class ProductsService {
   constructor(@InjectModel(Product.name) private productModel: SoftDeleteModel<ProductDocument>) { }
 
   async create(createProductDto: CreateProductDto, shop: IUser) {
-    const newProduct = await this.productModel.create({ ...createProductDto, shop_id: shop._id })
+    const newProduct = await this.productModel.create({
+      ...createProductDto, shop_id: shop._id, createdBy: {
+        _id: shop._id,
+        email: shop.email
+      }
+    })
     return newProduct;
   }
 
@@ -45,15 +51,36 @@ export class ProductsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findProductById(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException("Product Id invalid");
+    }
+    const product = await this.productModel.findById(id)
+    if (!product)
+      throw new BadRequestException("Product Id not found")
+    return product
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException("Product Id invalid");
+    }
+    const product = await this.productModel.findById(id)
+    if (!product)
+      throw new BadRequestException("Product Id not found")
+    await this.productModel.updateOne({ _id: id }, { ...updateProductDto })
+    const updatedProduct = await this.productModel.findById(id)
+    return updatedProduct;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException("Product Id invalid");
+    }
+    const product = await this.productModel.findById(id)
+    if (!product)
+      throw new BadRequestException("Product Id not found")
+    await this.productModel.softDelete({ _id: id })
+    return `removes a #${id} product`;
   }
 }
