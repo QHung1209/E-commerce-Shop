@@ -9,13 +9,13 @@ export class CreateProductDto {
     product_thumb: string
 
     @IsNotEmpty()
-    product_price: string
+    product_price: Number
 
     @IsNotEmpty()
     product_type: string
 
     @IsNotEmpty()
-    product_quantity: string
+    product_quantity: Number
 
     @IsNotEmpty()
     attributes: Record<string, any>;

@@ -7,10 +7,13 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/user.interface';
 import aqp from 'api-query-params';
 import { isValidObjectId } from 'mongoose';
+import { InventoriesService } from 'src/inventories/inventories.service';
+import { CreateInventoryDto } from 'src/inventories/dto/create-inventory.dto';
 
 @Injectable()
 export class ProductsService {
-  constructor(@InjectModel(Product.name) private productModel: SoftDeleteModel<ProductDocument>) { }
+  constructor(@InjectModel(Product.name) private productModel: SoftDeleteModel<ProductDocument>,
+    private inventoryService: InventoriesService) { }
 
   async create(createProductDto: CreateProductDto, shop: IUser) {
     const newProduct = await this.productModel.create({
@@ -19,6 +22,13 @@ export class ProductsService {
         email: shop.email
       }
     })
+    await this.inventoryService.create({
+      shop_id: shop._id,
+      product_id: newProduct.id,
+      stock: newProduct.product_quantity,
+      location: shop.address,
+      reservations: []
+    });
     return newProduct;
   }
 

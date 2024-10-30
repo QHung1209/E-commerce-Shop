@@ -7,11 +7,11 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
 
     product_thumb: string
 
-    product_price: string
+    product_price: Number
 
     product_type: string
 
-    product_quantity: string
+    product_quantity: Number
 
     attributes: Record<string, any>;
 }

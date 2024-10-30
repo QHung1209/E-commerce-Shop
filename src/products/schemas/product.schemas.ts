@@ -18,10 +18,10 @@ export class Product {
     product_thumb: string
 
     @Prop({ required: true })
-    product_price: string
+    product_price: Number
 
     @Prop({ required: true })
-    product_quantity: string
+    product_quantity: Number
 
     @Prop({ required: true })
     product_type: productType
