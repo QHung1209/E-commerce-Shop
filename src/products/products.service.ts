@@ -6,7 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/user.interface';
 import aqp from 'api-query-params';
-import { isValidObjectId } from 'mongoose';
+import mongoose, { isValidObjectId } from 'mongoose';
 import { InventoriesService } from 'src/inventories/inventories.service';
 import { CreateInventoryDto } from 'src/inventories/dto/create-inventory.dto';
 
@@ -28,7 +28,7 @@ export class ProductsService {
       stock: newProduct.product_quantity,
       location: shop.address,
       reservations: []
-    });
+    }, shop);
     return newProduct;
   }
 
@@ -41,10 +41,9 @@ export class ProductsService {
     let offset = (+currentPage - 1) * (+pageSize)
     let defaultLimit = +pageSize ? +pageSize : 10
 
-    const totalItems = (await this.productModel.find(filter)).length
-    console.log(totalItems)
+    const totalItems = (await this.productModel.find(filter).lean()).length
     const totalPages = Math.ceil(totalItems / defaultLimit)
-    const result = await this.productModel.find(filter)
+    const result = await this.productModel.find(filter).lean()
       .skip(offset)
       .limit(defaultLimit)
       .sort(sort as any)
@@ -61,11 +60,32 @@ export class ProductsService {
     }
   }
 
+  async findAllProductsInProductIds(currentPage: string, pageSize: string, productIds: Array<mongoose.Schema.Types.ObjectId>) {
+    let offset = (+currentPage - 1) * (+pageSize)
+    let defaultLimit = +pageSize ? +pageSize : 10
+
+    const totalItems = productIds.length
+    const totalPages = Math.ceil(totalItems / defaultLimit)
+    const result = await this.productModel.find({ _id: { $in: productIds } }).lean()
+      .skip(offset)
+      .limit(defaultLimit)
+      .exec();
+    return {
+      meta: {
+        current: currentPage,
+        pageSize: pageSize,
+        pages: totalPages,
+        total: totalItems,
+
+      }, result: result
+    }
+  }
+
   async findProductById(id: string) {
     if (!isValidObjectId(id)) {
       throw new BadRequestException("Product Id invalid");
     }
-    const product = await this.productModel.findById(id)
+    const product = await this.productModel.findById(id).lean()
     if (!product)
       throw new BadRequestException("Product Id not found")
     return product
@@ -75,7 +95,7 @@ export class ProductsService {
     if (!isValidObjectId(id)) {
       throw new BadRequestException("Product Id invalid");
     }
-    const product = await this.productModel.findById(id)
+    const product = await this.productModel.findById(id).lean()
     if (!product)
       throw new BadRequestException("Product Id not found")
     await this.productModel.updateOne({ _id: id }, { ...updateProductDto })
@@ -87,7 +107,7 @@ export class ProductsService {
     if (!isValidObjectId(id)) {
       throw new BadRequestException("Product Id invalid");
     }
-    const product = await this.productModel.findById(id)
+    const product = await this.productModel.findById(id).lean()
     if (!product)
       throw new BadRequestException("Product Id not found")
     await this.productModel.softDelete({ _id: id })

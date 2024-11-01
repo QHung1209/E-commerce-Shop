@@ -4,13 +4,19 @@ import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Inventory, InventoryDocument } from './schemas/inventory.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
+import { IUser } from 'src/users/user.interface';
 
 @Injectable()
 export class InventoriesService {
   constructor(@InjectModel(Inventory.name) private inventoryModel: SoftDeleteModel<InventoryDocument>) { }
-  async create(createInventoryDto: CreateInventoryDto) {
+  async create(createInventoryDto: CreateInventoryDto, shop: IUser) {
 
-    return await this.inventoryModel.create({ ...createInventoryDto })
+    return await this.inventoryModel.create({
+      ...createInventoryDto, createdBy: {
+        _id: shop._id,
+        email: shop.email
+      }
+    })
   }
 
   findAll() {

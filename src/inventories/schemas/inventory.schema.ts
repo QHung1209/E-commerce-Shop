@@ -20,5 +20,34 @@ export class Inventory {
     @Prop({ default: [] })
     reservations: Array<Record<string, any>>
 
+    @Prop({ default: Date.now })
+    createdAt: Date
+
+    @Prop({ default: Date.now })
+    updatedAt: Date
+
+    @Prop()
+    deletedAt: Date
+
+    @Prop()
+    isDeleted: boolean
+
+    @Prop({ type: Object })
+    createdBy: {
+        _id: mongoose.Schema.Types.ObjectId,
+        email: string
+    }
+
+    @Prop({ type: Object })
+    updatedBy: {
+        _id: mongoose.Schema.Types.ObjectId,
+        email: string
+    }
+
+    @Prop({ type: Object })
+    deleteddBy: {
+        _id: mongoose.Schema.Types.ObjectId,
+        email: string
+    }
 }
 export const InventorySchema = SchemaFactory.createForClass(Inventory)

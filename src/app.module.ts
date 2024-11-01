@@ -12,6 +12,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { ProductsModule } from './products/products.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { ProductsController } from './products/products.controller';
+import { InventoriesModule } from './inventories/inventories.module';
+import { InventoriesController } from './inventories/inventories.controller';
+import { DiscountsModule } from './discounts/discounts.module';
 
 @Module({
   imports: [MongooseModule.forRootAsync({
@@ -23,8 +26,8 @@ import { ProductsController } from './products/products.controller';
         return connection;
       }
     }), inject: [ConfigService]
-  }), ConfigModule.forRoot({ isGlobal: true }), UsersModule, AuthModule, ProductsModule],
-  controllers: [AppController, ProductsController],
+  }), ConfigModule.forRoot({ isGlobal: true }), UsersModule, AuthModule, ProductsModule, InventoriesModule, DiscountsModule],
+  controllers: [AppController, ProductsController, InventoriesController],
   providers: [AppService, AuthService, JwtService, {
     provide: APP_GUARD,
     useClass: JwtAuthGuard,
