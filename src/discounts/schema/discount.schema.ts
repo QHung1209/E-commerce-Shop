@@ -14,7 +14,7 @@ export class Discount {
     type: string
 
     @Prop({ required: true })
-    value: Number
+    value: number
 
     @Prop({ required: true })
     code: string
@@ -26,19 +26,19 @@ export class Discount {
     end_date: Date
 
     @Prop({ required: true })
-    max_uses: Number
+    max_uses: number
 
     @Prop({ required: true })
-    uses_count: Number
+    uses_count: number
 
     @Prop()
     users_used: Array<mongoose.Schema.Types.ObjectId>
 
     @Prop({ required: true })
-    max_uses_per_user: Number
+    max_uses_per_user: number
 
     @Prop({ required: true })
-    min_order_value: Number
+    min_order_value: number
 
     @Prop({ required: true, ref: 'User' })
     shop_id: mongoose.Schema.Types.ObjectId

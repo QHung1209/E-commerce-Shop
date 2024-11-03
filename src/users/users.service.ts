@@ -45,6 +45,10 @@ export class UsersService {
     return await this.userModel.updateOne({ _id: id }, { refreshToken: refreshToken })
   }
 
+  async findByUserId(userId: string) {
+    return await this.userModel.findById(userId)
+  }
+
 
   findAll() {
     return `This action returns all users`;

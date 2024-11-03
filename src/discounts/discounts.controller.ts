@@ -4,33 +4,45 @@ import { CreateDiscountDto } from './dto/create-discount.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
 import { User } from 'src/decorators/user.decorator';
 import { IUser } from 'src/users/user.interface';
+import { ResponseMessage } from 'src/decorators/customize';
 
 @Controller('discounts')
 export class DiscountsController {
   constructor(private readonly discountsService: DiscountsService) { }
 
   @Post()
+  @ResponseMessage("Create Discount")
   create(@Body() createDiscountDto: CreateDiscountDto, @User() shop: IUser) {
     return this.discountsService.create(createDiscountDto, shop);
   }
 
   @Get()
-  findAll(@Query('current') currentPage: string, @Query('pageSize') pageSize: string, @Query('shopId') shopId: string, @Query('code') code: string) {
-    return this.discountsService.findAllDiscountCodesWithProduct(currentPage, pageSize, shopId, code)
+  @ResponseMessage("Get All Discount Products By Code")
+  findAllDiscountProductsWithCode(@Query('current') currentPage: string, @Query('pageSize') pageSize: string, @Query('shopId') shopId: string, @Query('code') code: string) {
+    return this.discountsService.getAllDiscountProductsWithCode(currentPage, pageSize, shopId, code)
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.discountsService.findOne(+id);
+  @Get("/codes")
+  @ResponseMessage("Get All Discount Codes By Shop Id")
+  findAllDiscountCodesWithShopId(@Body('current') currentPage: string, @Body('pageSize') pageSize: string, @Body('shopId') shopId: string) {
+    return this.discountsService.getAllDiscountCodesWithShopId(currentPage, pageSize, shopId)
   }
+
+  @Get("/discount-amount")
+  @ResponseMessage("Get Discount Amount")
+  getDiscountAmount(@Body("userId") userId: string, @Body("shopId") shopId: string, @Body("code") code: string, @Body("products") products: Array<Record<string, any>>) {
+    return this.discountsService.getDiscountAmount(userId, shopId, code, products)
+  }
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDiscountDto: UpdateDiscountDto) {
     return this.discountsService.update(+id, updateDiscountDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.discountsService.remove(+id);
+  @Delete()
+  @ResponseMessage("Delet Discount")
+  delete(@Body('shopId') shopId: string, @Body('code') code: string) {
+    return this.discountsService.deleteDiscount(shopId, code);
   }
 }
