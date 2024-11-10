@@ -68,7 +68,7 @@ export class CartsService {
   }
 
   async addToCart(createCartDto: CreateCartDto, user: IUser) {
-    const userCart = await this.cartModel.findOne({ userId: user._id }).lean()
+    const userCart = await this.cartModel.findOne({ userId: user._id })
     if (!userCart) {
       return this.createUserCart(user, createCartDto.product)
     }
@@ -86,7 +86,7 @@ export class CartsService {
 
   async addToCartV2(updateCartDto: UpdateCartDto, user: IUser) {
     const { productId, quantity, old_quantity } = updateCartDto.product
-    if (quantity == 0)
+    if (quantity === 0)
       return this.removeProduct(updateCartDto, user)
     return await this.updateUserCartQuantity(user, {
       productId,
@@ -94,21 +94,12 @@ export class CartsService {
     })
   }
 
-
-
   async findAll(user: IUser) {
-    return await this.cartModel.find({ id: user._id }).lean()
+    return await this.cartModel.find({ userId: user._id }).lean()
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cart`;
+  async getCartByCartId(cartId: string) {
+    return await this.cartModel.findById(cartId)
   }
 
-  update(id: number, updateCartDto: UpdateCartDto) {
-    return `This action updates a #${id} cart`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
-  }
 }

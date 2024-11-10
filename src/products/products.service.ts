@@ -114,4 +114,16 @@ export class ProductsService {
     await this.productModel.softDelete({ _id: id })
     return `removes a #${id} product`;
   }
+
+  async checkProductByServer(products: Array<any>) {
+    return await Promise.all(products.map(async (product) => {
+      const existingProduct = await this.findProductById(product.productId)
+      if (existingProduct)
+        return {
+          productId: existingProduct._id,
+          price: existingProduct.product_price,
+          quantity: product.quantity
+        }
+    }))
+  }
 }

@@ -31,7 +31,7 @@ export class AuthService {
 
   async login(user: IUser, response: Response) {
 
-    if (user == null)
+    if (user === null)
       throw new UnauthorizedException("Check your email or password again.")
     const payload = {
       email: user.email,

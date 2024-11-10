@@ -5,13 +5,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Product, ProductSchema } from './schemas/product.schemas';
 import { InventoriesService } from 'src/inventories/inventories.service';
 import { Inventory, InventorySchema } from 'src/inventories/schemas/inventory.schema';
+import { InventoriesModule } from 'src/inventories/inventories.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }, {
-    name: Inventory.name, schema: InventorySchema
-  }])],
+  imports: [MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]), InventoriesModule],
   controllers: [ProductsController],
-  providers: [ProductsService, InventoriesService],
+  providers: [ProductsService],
   exports: [ProductsService],
 })
 export class ProductsModule { }
