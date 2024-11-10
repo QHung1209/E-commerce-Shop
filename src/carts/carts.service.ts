@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Cart, CartDocument } from './schemas/cart.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { ProductsService } from 'src/products/products.service';
+import { IUser } from 'src/users/user.interface';
 
 @Injectable()
 export class CartsService {
@@ -12,29 +13,39 @@ export class CartsService {
     // , private productService: ProductsService
   ) { }
 
-  async updateUserCartQuantity(userId: string, product: any) {
+  async updateUserCartQuantity(user: IUser, product: any) {
+    const { _id, email } = user
     const { productId, quantity } = product
     const query = {
-      userId,
+      userId: _id,
       'products.productId': productId,
       state: 'active'
     }, updateSet = {
       $inc: {
         'products.$.quantity': quantity
+      },
+      updatedBy: {
+        _id,
+        email
       }
+
     }, options = {
       upsert: true,
       new: true
     }
-    await this.cartModel.updateOne(query, updateSet, options)
-    return this.findAll(userId)
+    return await this.cartModel.findOneAndUpdate(query, updateSet, options)
   }
 
-  async createUserCart(userId: string, product: any) {
-    const query = { userId, state: 'active' }
+  async createUserCart(user: IUser, product: any) {
+    const { _id, email } = user
+    const query = { userId: _id, state: 'active' }
     const updateOrInsert = {
       $addToSet: {
         products: product
+      },
+      createdBy: {
+        _id,
+        email
       }
     }
     const options = { upsert: true, new: true }
@@ -44,8 +55,8 @@ export class CartsService {
   }
 
 
-  async removeProduct(updateCartDto: UpdateCartDto) {
-    const userId = updateCartDto.userId
+  async removeProduct(updateCartDto: UpdateCartDto, user: IUser) {
+    const userId = user._id
     const query = { userId, state: 'active' }
     const updateOrInsert = {
       $pull: {
@@ -56,28 +67,28 @@ export class CartsService {
     return await this.cartModel.updateOne(query, updateOrInsert)
   }
 
-  async addToCart(createCartDto: CreateCartDto) {
-    const userCart = await this.cartModel.findOne({ userId: createCartDto.userId })
+  async addToCart(createCartDto: CreateCartDto, user: IUser) {
+    const userCart = await this.cartModel.findOne({ userId: user._id }).lean()
     if (!userCart) {
-      return this.createUserCart(createCartDto.userId, createCartDto.product)
+      return this.createUserCart(user, createCartDto.product)
     }
     const existingProduct = userCart.products.find(
       (item) => item.productId.toString() === createCartDto.product.productId
     );
 
     if (existingProduct) {
-      return this.updateUserCartQuantity(createCartDto.userId, createCartDto.product);
+      return this.updateUserCartQuantity(user, createCartDto.product);
     }
     userCart.products.push(createCartDto.product);
     return userCart.save();
 
   }
 
-  async addToCartV2(updateCartDto: UpdateCartDto) {
+  async addToCartV2(updateCartDto: UpdateCartDto, user: IUser) {
     const { productId, quantity, old_quantity } = updateCartDto.product
     if (quantity == 0)
-      return this.removeProduct(updateCartDto)
-    return await this.updateUserCartQuantity(updateCartDto.userId, {
+      return this.removeProduct(updateCartDto, user)
+    return await this.updateUserCartQuantity(user, {
       productId,
       quantity: quantity - old_quantity
     })
@@ -85,8 +96,8 @@ export class CartsService {
 
 
 
-  async findAll(userId: string) {
-    return await this.cartModel.find({ userId })
+  async findAll(user: IUser) {
+    return await this.cartModel.find({ id: user._id }).lean()
   }
 
   findOne(id: number) {

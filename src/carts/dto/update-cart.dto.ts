@@ -6,9 +6,6 @@ export class UpdateCartDto {
     @IsNotEmpty()
     product: Record<string, any>
 
-    @IsNotEmpty()
-    userId: string
-
     old_quantity: number
 
     quantity: number

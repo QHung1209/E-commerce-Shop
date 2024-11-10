@@ -8,6 +8,4 @@ export class CreateCartDto {
 
     count_product: number
 
-    @IsNotEmpty()
-    userId: string
 }

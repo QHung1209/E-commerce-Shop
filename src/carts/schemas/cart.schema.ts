@@ -17,6 +17,35 @@ export class Cart {
     @Prop()
     userId: mongoose.Schema.Types.ObjectId
 
+    @Prop()
+    createdAt: Date
+
+    @Prop()
+    updatedAt: Date
+
+    @Prop()
+    deletedAt: Date
+
+    @Prop()
+    isDeleted: boolean
+
+    @Prop({ type: Object })
+    createdBy: {
+        _id: mongoose.Schema.Types.ObjectId,
+        email: string
+    }
+
+    @Prop({ type: Object })
+    updatedBy: {
+        _id: mongoose.Schema.Types.ObjectId,
+        email: string
+    }
+
+    @Prop({ type: Object })
+    deleteddBy: {
+        _id: mongoose.Schema.Types.ObjectId,
+        email: string
+    }
 }
 
 export const CartSchema = SchemaFactory.createForClass(Cart)
