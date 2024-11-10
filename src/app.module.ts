@@ -15,6 +15,7 @@ import { ProductsController } from './products/products.controller';
 import { InventoriesModule } from './inventories/inventories.module';
 import { InventoriesController } from './inventories/inventories.controller';
 import { DiscountsModule } from './discounts/discounts.module';
+import { CartsModule } from './carts/carts.module';
 
 @Module({
   imports: [MongooseModule.forRootAsync({
@@ -26,7 +27,7 @@ import { DiscountsModule } from './discounts/discounts.module';
         return connection;
       }
     }), inject: [ConfigService]
-  }), ConfigModule.forRoot({ isGlobal: true }), UsersModule, AuthModule, ProductsModule, InventoriesModule, DiscountsModule],
+  }), ConfigModule.forRoot({ isGlobal: true }), UsersModule, AuthModule, ProductsModule, InventoriesModule, DiscountsModule, CartsModule],
   controllers: [AppController, ProductsController, InventoriesController],
   providers: [AppService, AuthService, JwtService, {
     provide: APP_GUARD,

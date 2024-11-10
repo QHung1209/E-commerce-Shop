@@ -16,7 +16,7 @@ export class DiscountsController {
     return this.discountsService.create(createDiscountDto, shop);
   }
 
-  @Get()
+  @Get("/products")
   @ResponseMessage("Get All Discount Products By Code")
   findAllDiscountProductsWithCode(@Query('current') currentPage: string, @Query('pageSize') pageSize: string, @Query('shopId') shopId: string, @Query('code') code: string) {
     return this.discountsService.getAllDiscountProductsWithCode(currentPage, pageSize, shopId, code)

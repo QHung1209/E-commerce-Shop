@@ -44,6 +44,7 @@ export class ProductsService {
     const totalItems = (await this.productModel.find(filter).lean()).length
     const totalPages = Math.ceil(totalItems / defaultLimit)
     const result = await this.productModel.find(filter).lean()
+
       .skip(offset)
       .limit(defaultLimit)
       .sort(sort as any)
