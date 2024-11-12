@@ -14,4 +14,8 @@ export class CheckoutsController {
     return this.checkoutsService.checkoutReview(createCheckoutDto, user);
   }
 
+  @Post("order")
+  order(@Body() createCheckoutDto: CreateCheckoutDto, @User() user: IUser) {
+    return this.checkoutsService.orderByUser(createCheckoutDto, user);
+  }
 }

@@ -14,23 +14,4 @@ export class InventoriesController {
     return this.inventoriesService.create(createInventoryDto, user);
   }
 
-  @Get()
-  findAll() {
-    return this.inventoriesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.inventoriesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateInventoryDto: UpdateInventoryDto) {
-    return this.inventoriesService.update(+id, updateInventoryDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.inventoriesService.remove(+id);
-  }
 }

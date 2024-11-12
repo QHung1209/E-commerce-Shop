@@ -19,19 +19,25 @@ export class InventoriesService {
     })
   }
 
-  findAll() {
-    return `This action returns all inventories`;
+  async reservationInventory(productId: string, quantity: number, cartId: string) {
+    const query = {
+      product_id: productId,
+      stock: { $gte: quantity }
+    },
+      updateSet = {
+        $inc: {
+          stock: -quantity
+        },
+        $push: {
+          reservations: {
+            quantity,
+            cartId,
+            createdIn: new Date()
+          }
+        }
+      }
+    return await this.inventoryModel.updateOne(query, updateSet)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} inventory`;
-  }
 
-  update(id: number, updateInventoryDto: UpdateInventoryDto) {
-    return `This action updates a #${id} inventory`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} inventory`;
-  }
 }

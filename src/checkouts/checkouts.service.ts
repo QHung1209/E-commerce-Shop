@@ -8,6 +8,8 @@ import { CartsService } from 'src/carts/carts.service';
 import { IUser } from 'src/users/user.interface';
 import { ProductsService } from 'src/products/products.service';
 import { DiscountsService } from 'src/discounts/discounts.service';
+import { RedisService } from 'src/redis/redis.service';
+import { OrdersService } from 'src/orders/orders.service';
 
 @Injectable()
 export class CheckoutsService {
@@ -15,7 +17,9 @@ export class CheckoutsService {
     @InjectModel(Checkout.name) private checkoutModel: SoftDeleteModel<CheckoutDocument>,
     private cartService: CartsService,
     private productService: ProductsService,
-    private discountService: DiscountsService
+    private discountService: DiscountsService,
+    private redisService: RedisService,
+    private orderService: OrdersService
   ) { }
 
   async checkoutReview(createCheckoutDto: CreateCheckoutDto, user: IUser) {
@@ -62,6 +66,30 @@ export class CheckoutsService {
       checkout_order
     }
 
+  }
+
+  async orderByUser(createCheckoutDto: CreateCheckoutDto, user: IUser) {
+    const { shop_order_new, checkout_order } = await this.checkoutReview(createCheckoutDto, user)
+    const products = shop_order_new.flatMap(order => order.itemProducts)
+    console.log(products)
+    const acquireProduct = []
+    for (let product of products) {
+      const { productId, quantity } = product
+      const keyLock = await this.redisService.acquireLock(productId, quantity, createCheckoutDto.cartId)
+      acquireProduct.push(keyLock ? true : false)
+      if (keyLock)
+        await this.redisService.releaseLock(keyLock)
+    }
+    if (acquireProduct.includes(false))
+      throw new BadRequestException("Some products have been changed!, try later!")
+
+    const newOrder = await this.orderService.createOrder(user._id, checkout_order, user.address, "COD", products)
+    if (newOrder) {
+      for (let product of products) {
+        await this.cartService.removeProduct(product, user)
+      }
+    }
+    return newOrder;
   }
 
 

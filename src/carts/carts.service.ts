@@ -55,12 +55,12 @@ export class CartsService {
   }
 
 
-  async removeProduct(updateCartDto: UpdateCartDto, user: IUser) {
+  async removeProduct(productId: string, user: IUser) {
     const userId = user._id
     const query = { userId, state: 'active' }
     const updateOrInsert = {
       $pull: {
-        products: { productId: updateCartDto.product.productId }
+        products: { productId }
       }
     }
 
@@ -87,7 +87,7 @@ export class CartsService {
   async addToCartV2(updateCartDto: UpdateCartDto, user: IUser) {
     const { productId, quantity, old_quantity } = updateCartDto.product
     if (quantity === 0)
-      return this.removeProduct(updateCartDto, user)
+      return this.removeProduct(updateCartDto.product.productId, user)
     return await this.updateUserCartQuantity(user, {
       productId,
       quantity: quantity - old_quantity
