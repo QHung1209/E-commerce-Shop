@@ -19,6 +19,8 @@ import { CartsModule } from './carts/carts.module';
 import { CheckoutsModule } from './checkouts/checkouts.module';
 import { CustomRedisModule } from './redis/custom.redis.module';
 import { OrdersModule } from './orders/orders.module';
+import { CommentsModule } from './comments/comments.module';
+import { CommentsController } from './comments/comments.controller';
 
 @Module({
   imports: [MongooseModule.forRootAsync({
@@ -30,8 +32,8 @@ import { OrdersModule } from './orders/orders.module';
         return connection;
       }
     }), inject: [ConfigService]
-  }), ConfigModule.forRoot({ isGlobal: true }), UsersModule, AuthModule, ProductsModule, InventoriesModule, DiscountsModule, CartsModule, CheckoutsModule, CustomRedisModule, OrdersModule],
-  controllers: [AppController, ProductsController, InventoriesController],
+  }), ConfigModule.forRoot({ isGlobal: true }), UsersModule, AuthModule, ProductsModule, InventoriesModule, DiscountsModule, CartsModule, CheckoutsModule, CustomRedisModule, OrdersModule, CommentsModule],
+  controllers: [AppController, ProductsController, InventoriesController, CommentsController],
   providers: [AppService, AuthService, JwtService, {
     provide: APP_GUARD,
     useClass: JwtAuthGuard,

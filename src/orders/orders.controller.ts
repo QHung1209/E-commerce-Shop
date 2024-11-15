@@ -19,5 +19,8 @@ export class OrdersController {
     return this.ordersService.getOrderById(orderId)
   }
 
-
+  @Post()
+  updateOrder(@Body() updateOrderDto: UpdateOrderDto, @User() user: IUser) {
+    return this.ordersService.updateOrderStatus(updateOrderDto, user)
+  }
 }

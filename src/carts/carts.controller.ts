@@ -30,8 +30,8 @@ export class CartsController {
 
   @Delete()
   @ResponseMessage("Remove product from cart")
-  remove(@Body() updateCartDto: UpdateCartDto, @User() user: IUser) {
-    return this.cartsService.removeProduct(updateCartDto, user);
+  remove(@Body("productId") productId: string, @User() user: IUser) {
+    return this.cartsService.removeProduct(productId, user);
   }
 
 }

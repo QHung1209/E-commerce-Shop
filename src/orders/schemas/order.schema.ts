@@ -4,7 +4,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 export type OrderDocument = HydratedDocument<Order>
 @Schema()
 export class Order {
-    @Prop({ required: true, ref: 'Users' })
+    @Prop({ required: true, ref: 'User' })
     userId: mongoose.Schema.Types.ObjectId
 
     @Prop({ required: true, type: Object })

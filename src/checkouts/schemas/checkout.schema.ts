@@ -5,10 +5,10 @@ export type CheckoutDocument = HydratedDocument<Checkout>
 @Schema()
 export class Checkout {
 
-    @Prop()
+    @Prop({ required: true, ref: 'User' })
     userId: mongoose.Schema.Types.ObjectId
 
-    @Prop()
+    @Prop({ required: true, ref: 'Cart' })
     cartId: mongoose.Schema.Types.ObjectId
 
     @Prop()
