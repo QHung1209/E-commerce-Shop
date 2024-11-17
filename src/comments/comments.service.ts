@@ -6,10 +6,12 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { Comment, CommentDocument, CommentSchema } from './schemas/comment.schema';
 import { IUser } from '../users/user.interface';
 import { NotFoundError } from 'rxjs';
+import { ProductsService } from 'src/products/products.service';
 
 @Injectable()
 export class CommentsService {
-  constructor(@InjectModel(Comment.name) private commentModel: SoftDeleteModel<CommentDocument>) { }
+  constructor(@InjectModel(Comment.name) private commentModel: SoftDeleteModel<CommentDocument>
+    , private productService: ProductsService) { }
   async create(createCommentDto: CreateCommentDto, user: IUser) {
     let rightValue = 0;
     if (createCommentDto.comment_parentId) {
@@ -83,19 +85,59 @@ export class CommentsService {
     return comments
   }
 
-  findAll() {
-    return `This action returns all comments`;
-  }
+  async deleteComments(commentId: string, productId: string, user: IUser) {
+    const existsProduct = await this.productService.findProductById(productId)
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
-  }
+    if (!existsProduct)
+      throw new NotFoundException("Not found product id")
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
-  }
+    const existsComment = await this.commentModel.findById(commentId)
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+    if (!existsComment)
+      throw new NotFoundException("Not found comment id")
+
+    const leftValue = existsComment.comment_left
+    const rightValue = existsComment.comment_right
+
+    const width = rightValue - leftValue + 1
+
+    await this.commentModel.softDelete({
+      productId,
+      comment_left: { $gte: leftValue, $lte: rightValue },
+    })
+
+    await this.commentModel.updateMany({
+      productId,
+      comment_left: { $gte: leftValue, $lte: rightValue },
+    }, {
+      deletedBy: {
+        _id: user._id,
+        email: user.email
+      }
+    })
+
+    await this.commentModel.updateMany({
+      productId,
+      comment_right: { $gt: rightValue }
+    }, {
+      $inc: { comment_right: -width },
+      updatedBy: {
+        _id: user._id,
+        email: user.email
+      }
+    })
+
+    await this.commentModel.updateMany({
+      productId,
+      comment_left: { $gt: rightValue }
+    }, {
+      $inc: { comment_left: -width },
+      updatedBy: {
+        _id: user._id,
+        email: user.email
+      }
+    })
+
+    return true
   }
 }
