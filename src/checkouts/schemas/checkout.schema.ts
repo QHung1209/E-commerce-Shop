@@ -16,3 +16,5 @@ export class Checkout {
 }
 
 export const CheckoutSchema = SchemaFactory.createForClass(Checkout)
+CheckoutSchema.set('timestamps', true);
+

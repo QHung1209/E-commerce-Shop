@@ -9,11 +9,13 @@ import aqp from 'api-query-params';
 import mongoose, { isValidObjectId } from 'mongoose';
 import { InventoriesService } from 'src/inventories/inventories.service';
 import { CreateInventoryDto } from 'src/inventories/dto/create-inventory.dto';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class ProductsService {
   constructor(@InjectModel(Product.name) private productModel: SoftDeleteModel<ProductDocument>,
-    private inventoryService: InventoriesService) { }
+    private inventoryService: InventoriesService,
+    private notificationService: NotificationsService) { }
 
   async create(createProductDto: CreateProductDto, shop: IUser) {
     const newProduct = await this.productModel.create({
@@ -22,13 +24,19 @@ export class ProductsService {
         email: shop.email
       }
     })
-    await this.inventoryService.create({
-      shop_id: shop._id,
-      product_id: newProduct.id,
-      stock: newProduct.product_quantity,
-      location: shop.address,
-      reservations: []
-    }, shop);
+    if (newProduct) {
+      await this.inventoryService.create({
+        shop_id: shop._id,
+        product_id: newProduct.id,
+        stock: newProduct.product_quantity,
+        location: shop.address,
+        reservations: []
+      }, shop);
+
+      const newNoti = await this.notificationService.pushNotification(
+        'product', 1, shop._id, 'Create new Product', shop
+      )
+    }
     return newProduct;
   }
 

@@ -6,6 +6,7 @@ import { TransformInterceptor } from './core/transform.interceptor'
 import passport from 'passport';
 import { ConfigService } from '@nestjs/config';
 import cookieParser from 'cookie-parser';
+import { RabbitMQService } from './rabbitmq/rabbitmq.service';
 declare const module: any;
 
 async function bootstrap() {
@@ -23,8 +24,9 @@ async function bootstrap() {
     preflightContinue: false,
     credentials: true
   })
-
+  // const rmqService = app.get<RabbitMQService>(RabbitMQService)
   const configService = app.get(ConfigService)
+  // app.connectMicroservice(rmqService.getOptions('NOTIFICATION'))
   await app.listen(process.env.PORT);
   if (module.hot) {
     module.hot.accept();

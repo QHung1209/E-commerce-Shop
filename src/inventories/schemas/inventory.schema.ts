@@ -51,3 +51,4 @@ export class Inventory {
     }
 }
 export const InventorySchema = SchemaFactory.createForClass(Inventory)
+InventorySchema.set('timestamps', true);

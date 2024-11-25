@@ -11,16 +11,15 @@ import { JwtService } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
 import { ProductsModule } from './products/products.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { ProductsController } from './products/products.controller';
 import { InventoriesModule } from './inventories/inventories.module';
-import { InventoriesController } from './inventories/inventories.controller';
 import { DiscountsModule } from './discounts/discounts.module';
 import { CartsModule } from './carts/carts.module';
 import { CheckoutsModule } from './checkouts/checkouts.module';
 import { CustomRedisModule } from './redis/custom.redis.module';
 import { OrdersModule } from './orders/orders.module';
 import { CommentsModule } from './comments/comments.module';
-import { CommentsController } from './comments/comments.controller';
+import { NotificationsModule } from './notifications/notifications.module';
+import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [MongooseModule.forRootAsync({
@@ -32,8 +31,8 @@ import { CommentsController } from './comments/comments.controller';
         return connection;
       }
     }), inject: [ConfigService]
-  }), ConfigModule.forRoot({ isGlobal: true }), UsersModule, AuthModule, ProductsModule, InventoriesModule, DiscountsModule, CartsModule, CheckoutsModule, CustomRedisModule, OrdersModule, CommentsModule],
-  controllers: [AppController, ProductsController, InventoriesController, CommentsController],
+  }), ConfigModule.forRoot({ isGlobal: true }), UsersModule, AuthModule, ProductsModule, InventoriesModule, DiscountsModule, CartsModule, CheckoutsModule, CustomRedisModule, OrdersModule, CommentsModule, NotificationsModule, RabbitMQModule],
+  controllers: [AppController],
   providers: [AppService, AuthService, JwtService, {
     provide: APP_GUARD,
     useClass: JwtAuthGuard,

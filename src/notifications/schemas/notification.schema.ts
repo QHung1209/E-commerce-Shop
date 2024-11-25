@@ -1,21 +1,19 @@
-import { Schema, SchemaFactory, Prop } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
-
-export type CartDocument = HydratedDocument<Cart>
-
+export type NotificationDocument = HydratedDocument<Notification>
 @Schema()
-export class Cart {
-    @Prop({ required: true, enum: ['active', 'completed', 'failed', 'pending'], default: 'active' })
-    state: string
-
-    @Prop({ default: [] })
-    products: Array<Record<string, any>>
-
-    @Prop()
-    count_product: number
+export class Notification {
+    @Prop({ enum: ['order', 'product', 'promotion'], required: true })
+    noti_type: string
 
     @Prop({ required: true, ref: 'User' })
-    userId: mongoose.Schema.Types.ObjectId
+    senderId: mongoose.Schema.Types.ObjectId
+
+    @Prop({ required: true })
+    receiverId: number
+
+    @Prop({ required: true })
+    content: string
 
     @Prop()
     createdAt: Date
@@ -48,6 +46,5 @@ export class Cart {
     }
 }
 
-export const CartSchema = SchemaFactory.createForClass(Cart)
-CartSchema.set('timestamps', true);
-
+export const NotificationSchema = SchemaFactory.createForClass(Notification)
+NotificationSchema.set('timestamps', true);
