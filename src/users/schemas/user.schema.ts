@@ -5,6 +5,13 @@ export type UserDocument = HydratedDocument<User>
 
 @Schema()
 export class User {
+
+    @Prop({ type: mongoose.Schema.Types.ObjectId, required: true })
+    _id: string
+
+    @Prop({ required: true })
+    user_id: number
+
     @Prop({ required: true })
     email: string
 
@@ -23,7 +30,7 @@ export class User {
     @Prop()
     address: string
 
-    @Prop()
+    @Prop({ default: 'User' })
     role: string
 
     @Prop()

@@ -5,14 +5,15 @@ export type CommentDocument = HydratedDocument<Comment>;
 
 @Schema()
 export class Comment {
-    @Prop({ required: true, ref: 'Product' })
-    productId: mongoose.Schema.Types.ObjectId;
 
-    @Prop({ required: true, ref: 'User' })
-    userId: mongoose.Schema.Types.ObjectId;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Product' })
+    productId: string
 
-    @Prop({ ref: 'Comment' })
-    comment_parentId: mongoose.Schema.Types.ObjectId;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
+    userId: string
+
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' })
+    comment_parentId: string
 
     @Prop()
     comment_left: number;

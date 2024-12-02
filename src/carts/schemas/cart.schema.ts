@@ -14,8 +14,8 @@ export class Cart {
     @Prop()
     count_product: number
 
-    @Prop({ required: true, ref: 'User' })
-    userId: mongoose.Schema.Types.ObjectId
+    @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
+    userId: string
 
     @Prop()
     createdAt: Date

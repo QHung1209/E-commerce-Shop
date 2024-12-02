@@ -42,6 +42,7 @@ export class AuthService {
     }
     const refreshToken = this.createToken(payload, 'JWT_REFRESH_TOKEN', 'JWT_REFRESH_EXPIRE')
     await this.userService.updateUserRefreshToken(refreshToken, user._id)
+
     response.cookie('refresh_token', refreshToken,
       {
         httpOnly: true,

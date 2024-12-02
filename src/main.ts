@@ -7,12 +7,15 @@ import passport from 'passport';
 import { ConfigService } from '@nestjs/config';
 import cookieParser from 'cookie-parser';
 import { RabbitMQService } from './rabbitmq/rabbitmq.service';
+import { RolesGuard } from './auth/roles.guard';
+import { PoliciesGuard } from './auth/policies.guard';
 declare const module: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const reflector = app.get(Reflector)
   app.useGlobalGuards(new JwtAuthGuard(reflector))
+  // app.useGlobalGuards(new RolesGuard(reflector))
   app.useGlobalPipes(new ValidationPipe())
   app.useGlobalInterceptors(new TransformInterceptor(reflector))
 

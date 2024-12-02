@@ -6,11 +6,11 @@ export class Notification {
     @Prop({ enum: ['order', 'product', 'promotion'], required: true })
     noti_type: string
 
-    @Prop({ required: true, ref: 'User' })
-    senderId: mongoose.Schema.Types.ObjectId
+    @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
+    senderId: string
 
-    @Prop({ required: true })
-    receiverId: number
+    @Prop({ type: mongoose.Schema.Types.ObjectId, required: true })
+    receiverId: string
 
     @Prop({ required: true })
     content: string

@@ -20,6 +20,11 @@ import { OrdersModule } from './orders/orders.module';
 import { CommentsModule } from './comments/comments.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
+import { ResourcesModule } from './resources/resources.module';
+import { RolesModule } from './roles/roles.module';
+import { RolesGuard } from './auth/roles.guard';
+import { CaslModule } from './casl/casl.module';
+import { PoliciesGuard } from './auth/policies.guard';
 
 @Module({
   imports: [MongooseModule.forRootAsync({
@@ -31,11 +36,20 @@ import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
         return connection;
       }
     }), inject: [ConfigService]
-  }), ConfigModule.forRoot({ isGlobal: true }), UsersModule, AuthModule, ProductsModule, InventoriesModule, DiscountsModule, CartsModule, CheckoutsModule, CustomRedisModule, OrdersModule, CommentsModule, NotificationsModule, RabbitMQModule],
+  }), ConfigModule.forRoot({ isGlobal: true }), UsersModule, AuthModule, ProductsModule, InventoriesModule, DiscountsModule, CartsModule, CheckoutsModule, CustomRedisModule, OrdersModule, CommentsModule, NotificationsModule, RabbitMQModule, ResourcesModule, RolesModule, CaslModule],
   controllers: [AppController],
   providers: [AppService, AuthService, JwtService, {
     provide: APP_GUARD,
-    useClass: JwtAuthGuard,
-  },],
+    useClass: JwtAuthGuard
+  },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard
+    // },
+    {
+      provide: APP_GUARD,
+      useClass: PoliciesGuard
+    },
+  ],
 })
 export class AppModule { }

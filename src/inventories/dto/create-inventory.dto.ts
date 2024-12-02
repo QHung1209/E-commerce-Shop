@@ -5,7 +5,7 @@ export class CreateInventoryDto {
     product_id: string
 
     @IsNotEmpty()
-    shop_id: string
+    shopId: string
 
     location: String
 

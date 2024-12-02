@@ -19,14 +19,14 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto, shop: IUser) {
     const newProduct = await this.productModel.create({
-      ...createProductDto, shop_id: shop._id, createdBy: {
+      ...createProductDto, shopId: shop._id, createdBy: {
         _id: shop._id,
         email: shop.email
       }
     })
     if (newProduct) {
       await this.inventoryService.create({
-        shop_id: shop._id,
+        shopId: shop._id,
         product_id: newProduct.id,
         stock: newProduct.product_quantity,
         location: shop.address,

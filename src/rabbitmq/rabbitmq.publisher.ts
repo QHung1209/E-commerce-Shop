@@ -22,6 +22,8 @@ export class RabbitmqPublisher {
                         durable: false
                     })
 
+                    channel.prefetch(1)
+
                     const messageProperties = {
                         messageId: v4().toString(),
                         timestamp: new Date(),

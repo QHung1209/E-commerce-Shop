@@ -27,12 +27,12 @@ export class DiscountsService {
 
     const isExists = await this.discountModel.findOne({
       code: createDiscountDto.code,
-      shop_id: shop._id
+      shopId: shop._id
     }).lean()
     if (isExists && isExists.is_active)
       throw new BadRequestException("Discount exists")
     const newDiscount = await this.discountModel.create({
-      ...createDiscountDto, shop_id: shop._id, createdBy: {
+      ...createDiscountDto, shopId: shop._id, createdBy: {
         _id: shop._id,
         email: shop.email
       }
@@ -43,7 +43,7 @@ export class DiscountsService {
   async getAllDiscountProductsWithCode(currentPage: string, pageSize: string, shopId: string, code: string) {
     const isExists = await this.discountModel.findOne({
       code,
-      shop_id: shopId
+      shopId: shopId
     }).lean()
     if (!isExists || !isExists.is_active)
       throw new BadRequestException("Discount not exists")
@@ -64,9 +64,9 @@ export class DiscountsService {
     let offset = (+currentPage - 1) * (+pageSize)
     let defaultLimit = +pageSize ? +pageSize : 10
 
-    const totalItems = (await this.discountModel.find({ shop_id: shopId }).lean()).length
+    const totalItems = (await this.discountModel.find({ shopId: shopId }).lean()).length
     const totalPages = Math.ceil(totalItems / defaultLimit)
-    const result = await this.discountModel.find({ shop_id: shopId }).lean()
+    const result = await this.discountModel.find({ shopId: shopId }).lean()
       .skip(offset)
       .limit(defaultLimit)
       .exec();
@@ -102,7 +102,7 @@ export class DiscountsService {
   async getDiscountAmount(userId: string, shopId: string, code: string, products: Array<Record<string, any>>) {
     const isExists = await this.discountModel.findOne({
       code: code,
-      shop_id: shopId
+      shopId: shopId
     }).lean()
     if (!isExists || !isExists.is_active)
       throw new BadRequestException("Discount doesn't exists or expried")
@@ -145,7 +145,7 @@ export class DiscountsService {
   }
 
   async deleteDiscount(shopId: string, code: string) {
-    const deleted = await this.discountModel.softDelete({ shop_id: shopId, code })
+    const deleted = await this.discountModel.softDelete({ shopId: shopId, code })
     return deleted
   }
 

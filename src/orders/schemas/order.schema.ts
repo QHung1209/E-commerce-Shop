@@ -4,8 +4,8 @@ import mongoose, { HydratedDocument } from 'mongoose';
 export type OrderDocument = HydratedDocument<Order>
 @Schema()
 export class Order {
-    @Prop({ required: true, ref: 'User' })
-    userId: mongoose.Schema.Types.ObjectId
+    @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
+    userId: string
 
     @Prop({ required: true, type: Object })
     checkout: Record<string, any>
@@ -24,6 +24,9 @@ export class Order {
 
     @Prop({ enum: ['pending', 'confirmed', 'shipping', 'canceled', 'delivered'], default: 'pending' })
     status: string
+
+    @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
+    shopId: string
 
     @Prop()
     createdAt: Date
