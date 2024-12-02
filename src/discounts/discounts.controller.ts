@@ -5,6 +5,9 @@ import { UpdateDiscountDto } from './dto/update-discount.dto';
 import { User } from 'src/decorators/user.decorator';
 import { IUser } from 'src/users/user.interface';
 import { ResponseMessage } from 'src/decorators/customize';
+import { CheckPolicies } from 'src/decorators/policies.decorator';
+import { Action, AppAbility } from 'src/casl/casl-ability.factory';
+import { Discount } from './schema/discount.schema';
 
 @Controller('discounts')
 export class DiscountsController {
@@ -12,6 +15,9 @@ export class DiscountsController {
 
   @Post()
   @ResponseMessage("Create Discount")
+  @CheckPolicies((ability: AppAbility) =>
+    ability.can(Action.Create, Discount),
+  )
   create(@Body() createDiscountDto: CreateDiscountDto, @User() shop: IUser) {
     return this.discountsService.create(createDiscountDto, shop);
   }
