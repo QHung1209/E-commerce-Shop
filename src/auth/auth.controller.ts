@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Res, Request, Body, SetMetadata, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, UseGuards, Res, Request, Body, SetMetadata, Req, UnauthorizedException, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public, ResponseMessage } from 'src/decorators/customize';
 import { Response, Request as RequestE } from 'express';
@@ -40,5 +40,17 @@ export class AuthController {
     response.clearCookie('refresh_token', { httpOnly: true });
 
     return response.json({ message: 'Logged out successfully' });
+  }
+
+  @Public()
+  @Get("google")
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req) {}
+
+  @Public()
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  googleAuthRedirect(@Req() req) {
+    return this.authService.googleLogin(req)
   }
 }

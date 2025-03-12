@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './passport/jwt.strategy';
 import { CustomRedisModule } from 'src/redis/custom.redis.module';
+import { GoogleStrategy } from './passport/google.strategy';
 const ms = require('ms')
 @Module({
   imports: [UsersModule, PassportModule,CustomRedisModule, JwtModule.registerAsync({
@@ -19,7 +20,7 @@ const ms = require('ms')
     inject: [ConfigService],
   }),],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
   exports: [AuthService],
 })
 export class AuthModule { }
