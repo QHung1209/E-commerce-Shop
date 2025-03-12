@@ -31,31 +31,36 @@ export class AuthService {
     return token
   }
 
-  async login(user: IUser, response: Response) {
 
-    if (user === null)
-      throw new UnauthorizedException("Check your email or password again.")
+  private async generateTokensAndSetCookie(user: IUser, response: Response) {
     const payload = {
       email: user.email,
       name: user.name,
-      _id: user._id,
+      _id: String(user._id),
       address: user.address,
       role: user.role
-    }
-    const refreshToken = this.createToken(payload, 'JWT_REFRESH_TOKEN', 'JWT_REFRESH_EXPIRE')
-    await this.userService.updateUserRefreshToken(refreshToken, user._id)
-
-    response.cookie('refresh_token', refreshToken,
-      {
-        httpOnly: true,
-        maxAge: ms(this.configService.get<string>('JWT_REFRESH_EXPIRE'))
-      })
-    const accessToken = this.createToken(payload, 'JWT_ACCESS_TOKEN', 'JWT_ACCESS_EXPIRE')
-    return {
-      accessToken,
-      user: payload
-    }
+    };
+  
+    const refreshToken = this.createToken(payload, 'JWT_REFRESH_TOKEN', 'JWT_REFRESH_EXPIRE');
+    await this.userService.updateUserRefreshToken(refreshToken, String(user._id));
+  
+    response.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      maxAge: ms(this.configService.get<string>('JWT_REFRESH_EXPIRE'))
+    });
+  
+    const accessToken = this.createToken(payload, 'JWT_ACCESS_TOKEN', 'JWT_ACCESS_EXPIRE');
+    console.log(accessToken)
+    return { accessToken, user: payload };
   }
+  
+
+  async login(user: IUser, response: Response) {
+    if (!user) throw new UnauthorizedException("Check your email or password again.");
+  
+    return this.generateTokensAndSetCookie(user, response);
+  }
+  
 
   async register(createUserDTO: CreateUserDto) {
     const user = await this.userService.create(createUserDTO)
@@ -78,14 +83,11 @@ export class AuthService {
     }
   }
 
-  googleLogin(req: { user: any; }) {
-    if (!req.user) {
-      return 'No user from google'
-    }
-
-    return {
-      message: 'User information from google',
-      user: req.user
-    }
+  async googleLogin(req: { user: IUser }, response: Response) {
+    if (!req.user) return { message: 'No user from Google' };
+  
+    const checkUser = await this.userService.findOrCreate(req.user.email, req.user.name);
+    
+    return this.generateTokensAndSetCookie(checkUser, response);
   }
 }

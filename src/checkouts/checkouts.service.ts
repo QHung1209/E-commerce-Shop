@@ -50,7 +50,7 @@ export class CheckoutsService {
       }
 
       if (shop_discount) {
-        const { discount } = await this.discountService.getDiscountAmount(user._id, shopId, shop_discount.code, checkProductServer)
+        const { discount } = await this.discountService.getDiscountAmount(String(user._id), shopId, shop_discount.code, checkProductServer)
         checkout_order.totalDiscount = discount
 
         if (discount > 0) {
@@ -83,7 +83,7 @@ export class CheckoutsService {
     if (acquireProduct.includes(false))
       throw new BadRequestException("Some products have been changed!, try later!")
 
-    const newOrder = await this.orderService.createOrder(user._id, checkout_order, user.address, "COD", products)
+    const newOrder = await this.orderService.createOrder(String(user._id), checkout_order, user.address, "COD", products)
     if (newOrder) {
       for (let product of products) {
         await this.cartService.removeProduct(product, user)

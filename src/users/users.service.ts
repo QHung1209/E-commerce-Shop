@@ -5,7 +5,7 @@ import { compareSync, hashSync } from 'bcryptjs';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
-
+const randomString = require("randomstring")
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>) { }
@@ -35,6 +35,21 @@ export class UsersService {
 
   checkUserPassword = (password: string, hashPassword: string) => {
     return compareSync(password, hashPassword)
+  }
+
+  async findOrCreate( email: string, name: string ) {
+    const hashedPassword = this.hashPassword(randomString.generate()); 
+  
+    return await this.userModel.findOneAndUpdate(
+      { email: email },
+      { 
+        $setOnInsert: { 
+          name: name,
+          password: hashedPassword
+        },
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    ).exec()
   }
 
   async findByUsername(username: string) {

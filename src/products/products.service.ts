@@ -26,7 +26,7 @@ export class ProductsService {
     })
     if (newProduct) {
       await this.inventoryService.create({
-        shopId: shop._id,
+        shopId: String(shop._id),
         product_id: newProduct.id,
         stock: newProduct.product_quantity,
         location: shop.address,
@@ -34,7 +34,7 @@ export class ProductsService {
       }, shop);
 
       const newNoti = await this.notificationService.pushNotification(
-        'product', null, shop._id, 'Create new Product', shop
+        'product', null, String(shop._id), 'Create new Product', shop
       )
     }
     return newProduct;
