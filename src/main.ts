@@ -3,18 +3,18 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor'
-import passport from 'passport';
 import { ConfigService } from '@nestjs/config';
 import cookieParser from 'cookie-parser';
 import { RabbitMQService } from './rabbitmq/rabbitmq.service';
-import { RolesGuard } from './auth/roles.guard';
 import { PoliciesGuard } from './auth/policies.guard';
+import { RedisService } from './redis/redis.service';
 declare const module: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const reflector = app.get(Reflector)
-  app.useGlobalGuards(new JwtAuthGuard(reflector))
+  const redisService = app.get(RedisService);
+  app.useGlobalGuards(new JwtAuthGuard(reflector,redisService))
   // app.useGlobalGuards(new RolesGuard(reflector))
   app.useGlobalPipes(new ValidationPipe())
   app.useGlobalInterceptors(new TransformInterceptor(reflector))

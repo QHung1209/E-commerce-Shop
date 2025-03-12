@@ -5,7 +5,7 @@ export type OrderDocument = HydratedDocument<Order>
 @Schema()
 export class Order {
     @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
-    userId: string
+    userId: mongoose.Schema.Types.ObjectId
 
     @Prop({ required: true, type: Object })
     checkout: Record<string, any>
@@ -26,7 +26,7 @@ export class Order {
     status: string
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
-    shopId: string
+    shopId: mongoose.Schema.Types.ObjectId
 
     @Prop()
     createdAt: Date

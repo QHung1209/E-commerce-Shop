@@ -6,7 +6,7 @@ export type CheckoutDocument = HydratedDocument<Checkout>
 export class Checkout {
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
-    userId: string
+    userId: mongoose.Schema.Types.ObjectId
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Cart' })
     cartId: string
@@ -17,4 +17,3 @@ export class Checkout {
 
 export const CheckoutSchema = SchemaFactory.createForClass(Checkout)
 CheckoutSchema.set('timestamps', true);
-

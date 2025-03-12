@@ -34,7 +34,7 @@ export class ProductsService {
       }, shop);
 
       const newNoti = await this.notificationService.pushNotification(
-        'product', 1, shop._id, 'Create new Product', shop
+        'product', null, shop._id, 'Create new Product', shop
       )
     }
     return newProduct;

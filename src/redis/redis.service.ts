@@ -37,4 +37,13 @@ export class RedisService {
     async releaseLock(key: string): Promise<void> {
         await this.redisClient.del(key);
     }
+
+
+    async set(key: string, value: string, expiredTime: number) {
+        await this.redisClient.set(key, value, 'PX', expiredTime);
+    }
+
+    async get(key: string) {
+        return await this.redisClient.get(key);
+    }
 }

@@ -41,7 +41,7 @@ export class Discount {
     min_order_value: number
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
-    shopId: string
+    shopId: mongoose.Schema.Types.ObjectId
 
     @Prop({ required: true, default: true })
     is_active: boolean

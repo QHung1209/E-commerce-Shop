@@ -9,7 +9,7 @@ export class Inventory {
     product_id: mongoose.Schema.Types.ObjectId
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
-    shopId: string
+    shopId: mongoose.Schema.Types.ObjectId
 
     @Prop({ required: true })
     location: String

@@ -7,10 +7,12 @@ import { Response } from 'express';
 import { User } from 'src/users/schemas/user.schema';
 import { IUser } from 'src/users/user.interface';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class AuthService {
   constructor(private userService: UsersService, private jwtService: JwtService,
+    private redisService: RedisService,
     private configService: ConfigService) { }
 
   async validateUser(username: string, password: string): Promise<any> {
@@ -62,6 +64,17 @@ export class AuthService {
       email: user.email,
       name: user.name,
       createdAt: user.createdAt
+    }
+  }
+
+  async logout(token: string) {
+    const decoded = this.jwtService.decode(token)
+    const tokenExpiry = decoded.exp * 1000
+    const currentTime = Date.now();
+    const ttl = tokenExpiry - currentTime;
+
+    if (ttl > 0) {
+      await this.redisService.set(token, 'blacklisted', ttl);
     }
   }
 }

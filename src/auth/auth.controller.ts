@@ -1,7 +1,7 @@
-import { Controller, Post, UseGuards, Res, Request, Body, SetMetadata } from '@nestjs/common';
+import { Controller, Post, UseGuards, Res, Request, Body, SetMetadata, Req, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public, ResponseMessage } from 'src/decorators/customize';
-import { Response } from 'express';
+import { Response, Request as RequestE } from 'express';
 import { LocalAuthGuard } from './local.auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -23,5 +23,22 @@ export class AuthController {
   @Post('/register')
   async register(@Body() createUserDto: CreateUserDto) {
     return this.authService.register(createUserDto)
+  }
+
+  @Post('logout')
+  async logout(@Req() request: RequestE, @Res() response: Response) {
+    const authHeader = request.headers.authorization as string | undefined;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Token is missing');
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    await this.authService.logout(token);
+
+    response.clearCookie('refresh_token', { httpOnly: true });
+
+    return response.json({ message: 'Logged out successfully' });
   }
 }

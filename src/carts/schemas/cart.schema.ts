@@ -15,7 +15,7 @@ export class Cart {
     count_product: number
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
-    userId: string
+    userId: mongoose.Schema.Types.ObjectId
 
     @Prop()
     createdAt: Date
@@ -50,4 +50,3 @@ export class Cart {
 
 export const CartSchema = SchemaFactory.createForClass(Cart)
 CartSchema.set('timestamps', true);
-

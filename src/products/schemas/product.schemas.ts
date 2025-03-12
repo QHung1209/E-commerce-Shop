@@ -27,7 +27,7 @@ export class Product {
     product_type: productType
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
-    shopId: string
+    shopId: mongoose.Schema.Types.ObjectId
 
     @Prop({ type: Map, of: String })
     attributes: Record<string, any>;

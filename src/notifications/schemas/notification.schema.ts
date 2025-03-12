@@ -7,10 +7,10 @@ export class Notification {
     noti_type: string
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
-    senderId: string
+    senderId: mongoose.Schema.Types.ObjectId
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, required: true })
-    receiverId: string
+    @Prop({ type: mongoose.Schema.Types.ObjectId })
+    receiverId: mongoose.Schema.Types.ObjectId
 
     @Prop({ required: true })
     content: string

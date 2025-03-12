@@ -10,7 +10,7 @@ export class Comment {
     productId: string
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
-    userId: string
+    userId: mongoose.Schema.Types.ObjectId
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' })
     comment_parentId: string

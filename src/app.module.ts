@@ -22,7 +22,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 import { ResourcesModule } from './resources/resources.module';
 import { RolesModule } from './roles/roles.module';
-import { RolesGuard } from './auth/roles.guard';
+// import { RolesGuard } from './auth/roles.guard';
 import { CaslModule } from './casl/casl.module';
 import { PoliciesGuard } from './auth/policies.guard';
 
