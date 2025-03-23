@@ -2,6 +2,7 @@ import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
+import { join } from 'path/win32';
 import { InventoriesService } from 'src/inventories/inventories.service';
 
 
@@ -38,7 +39,6 @@ export class RedisService {
         await this.redisClient.del(key);
     }
 
-
     async set(key: string, value: string, expiredTime: number) {
         await this.redisClient.set(key, value, 'PX', expiredTime);
     }
@@ -46,4 +46,22 @@ export class RedisService {
     async get(key: string) {
         return await this.redisClient.get(key);
     }
+
+    async jsonSet(key: string, json: any)
+    {   try {
+        return await this.redisClient.call('JSON.SET', key,'$', JSON.stringify(json))
+        
+    } catch (error) {
+        throw error
+    }
+    }
+
+    async jsonGet(key: string) {
+        try {
+          const result = await this.redisClient.call('JSON.GET', key, '$') as string | null;
+          return result ? JSON.parse(result) : null;
+        } catch (error) {
+          throw error;
+        }
+      }
 }

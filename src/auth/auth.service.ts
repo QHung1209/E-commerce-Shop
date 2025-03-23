@@ -26,7 +26,7 @@ export class AuthService {
   createToken(payload: any, type: any, expiredTime: any) {
     const token = this.jwtService.sign(payload, {
       secret: this.configService.get<string>(type),
-      expiresIn: ms(this.configService.get<string>(expiredTime)) / 1000
+      expiresIn: this.configService.get<string>(expiredTime)
     })
     return token
   }
@@ -74,9 +74,14 @@ export class AuthService {
 
   async logout(token: string) {
     const decoded = this.jwtService.decode(token)
+
+    if (!decoded) throw new UnauthorizedException('Invalid token');
+
     const tokenExpiry = decoded.exp * 1000
     const currentTime = Date.now();
     const ttl = tokenExpiry - currentTime;
+
+    await this.userService.updateUserRefreshToken(null, String(decoded._id));
 
     if (ttl > 0) {
       await this.redisService.set(token, 'blacklisted', ttl);
@@ -87,6 +92,8 @@ export class AuthService {
     if (!req.user) return { message: 'No user from Google' };
   
     const checkUser = await this.userService.findOrCreate(req.user.email, req.user.name);
+
+    if (!checkUser) throw new UnauthorizedException('Failed to authenticate with Google');
     
     return this.generateTokensAndSetCookie(checkUser, response);
   }
