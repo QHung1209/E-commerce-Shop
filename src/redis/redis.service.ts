@@ -6,8 +6,10 @@ import { join } from 'path/win32';
 import { InventoriesService } from 'src/inventories/inventories.service';
 
 
+
 @Injectable()
 export class RedisService {
+    private readonly CACHE_TTL = 1800
     constructor(@InjectRedis() private readonly redisClient: Redis,
         private configService: ConfigService,
         private inventoryService: InventoriesService) { }
@@ -19,8 +21,12 @@ export class RedisService {
 
         for (let retry = 0; retry < retryTimes; retry++) {
             const result = await this.redisClient.set(key, 'locked', 'PX', expiredTime, 'NX');
-            if (result) {
+            console.log('pessimistic lock hihihi >>>>>', result, retry)
+            if (result != null) {
                 const isReservation = await this.inventoryService.reservationInventory(productId, quantity, cartId)
+
+                // await new Promise(resolve => setTimeout(resolve, 500));
+
                 if (isReservation.modifiedCount) {
                     await this.redisClient.expire(key, expiredTime)
                     return key
@@ -39,13 +45,6 @@ export class RedisService {
         await this.redisClient.del(key);
     }
 
-    async set(key: string, value: string, expiredTime: number) {
-        await this.redisClient.set(key, value, 'PX', expiredTime);
-    }
-
-    async get(key: string) {
-        return await this.redisClient.get(key);
-    }
 
     async jsonSet(key: string, json: any)
     {   try {
@@ -64,4 +63,29 @@ export class RedisService {
           throw error;
         }
       }
+    async setPX(key: string, value: string, expiredTime: number) 
+      {
+          await this.redisClient.set(key, value, 'PX', expiredTime);
+      }
+
+      async setEX(key: string, value: string, expiredTime: number) 
+      {
+          await this.redisClient.set(key, value, 'EX', expiredTime);
+      }
+  
+    async get(key: string) {
+          return await this.redisClient.get(key);
+      }
+
+    hgetall(key: string) {
+        return this.redisClient.hgetall(key);
+    }
+
+    hincrby(hash, key, incr) {
+        return this.redisClient.hincrby(hash, key, incr);
+    }
+
+    del(key: string) {
+        return this.redisClient.del(key);
+    }
 }

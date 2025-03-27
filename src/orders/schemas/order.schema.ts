@@ -25,9 +25,6 @@ export class Order {
     @Prop({ enum: ['pending', 'confirmed', 'shipping', 'canceled', 'delivered'], default: 'pending' })
     status: string
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' })
-    shopId: mongoose.Schema.Types.ObjectId
-
     @Prop()
     createdAt: Date
 

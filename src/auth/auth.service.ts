@@ -84,7 +84,7 @@ export class AuthService {
     await this.userService.updateUserRefreshToken(null, String(decoded._id));
 
     if (ttl > 0) {
-      await this.redisService.set(token, 'blacklisted', ttl);
+      await this.redisService.setPX(token, 'blacklisted', ttl);
     }
   }
 

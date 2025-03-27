@@ -15,9 +15,9 @@ export class ProductsController {
 
   @Post()
   @ResponseMessage("Create new product")
-  // @CheckPolicies((ability: AppAbility) =>
-  //   ability.can(Action.Create, Product),
-  // )
+  @CheckPolicies((ability: AppAbility) =>
+    ability.can(Action.Create, Product),
+  )
   create(@Body() createProductDto: CreateProductDto, @User() user: IUser) {
     return this.productsService.create(createProductDto, user);
   }

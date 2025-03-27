@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import { RabbitMQService } from './rabbitmq/rabbitmq.service';
 import { PoliciesGuard } from './auth/policies.guard';
 import { RedisService } from './redis/redis.service';
+import { CaslAbilityFactory } from './casl/casl-ability.factory';
 declare const module: any;
 
 async function bootstrap() {
@@ -15,7 +16,7 @@ async function bootstrap() {
   const reflector = app.get(Reflector)
   const redisService = app.get(RedisService);
   app.useGlobalGuards(new JwtAuthGuard(reflector,redisService))
-  // app.useGlobalGuards(new RolesGuard(reflector))
+  app.useGlobalGuards(new PoliciesGuard(reflector, new CaslAbilityFactory()))
   app.useGlobalPipes(new ValidationPipe())
   app.useGlobalInterceptors(new TransformInterceptor(reflector))
 

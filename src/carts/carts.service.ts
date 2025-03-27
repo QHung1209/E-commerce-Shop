@@ -6,12 +6,18 @@ import { Cart, CartDocument } from './schemas/cart.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { ProductsService } from 'src/products/products.service';
 import { IUser } from 'src/users/user.interface';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class CartsService {
+  private readonly CACHE_TTL = 1800;
   constructor(@InjectModel(Cart.name) private cartModel: SoftDeleteModel<CartDocument>
-    // , private productService: ProductsService
+    , private redisClient: RedisService
   ) { }
+
+  private getCacheKey(userId: string) {
+    return `cart:${userId}`;
+  }
 
   async updateUserCartQuantity(user: IUser, product: any) {
     const { _id, email } = user
@@ -33,6 +39,7 @@ export class CartsService {
       upsert: true,
       new: true
     }
+    await this.redisClient.del(this.getCacheKey(String(user._id)));
     return await this.cartModel.findOneAndUpdate(query, updateSet, options)
   }
 
@@ -49,7 +56,7 @@ export class CartsService {
       }
     }
     const options = { upsert: true, new: true }
-
+    await this.redisClient.del(this.getCacheKey(String(user._id)));
     return await this.cartModel.findOneAndUpdate(query, updateOrInsert, options)
 
   }
@@ -63,7 +70,7 @@ export class CartsService {
         products: { productId }
       }
     }
-
+    await this.redisClient.del(this.getCacheKey(String(user._id)));
     return await this.cartModel.updateOne(query, updateOrInsert)
   }
 
@@ -79,6 +86,7 @@ export class CartsService {
     if (existingProduct) {
       return this.updateUserCartQuantity(user, createCartDto.product);
     }
+    await this.redisClient.del(this.getCacheKey(String(user._id)));
     userCart.products.push(createCartDto.product);
     return userCart.save();
 
@@ -95,7 +103,17 @@ export class CartsService {
   }
 
   async findAll(user: IUser) {
-    return await this.cartModel.find({ userId: user._id }).lean()
+    const cacheKey = this.getCacheKey(String(user._id));
+    const cachedCart = await this.redisClient.get(cacheKey);
+
+    if (cachedCart) {
+      return JSON.parse(cachedCart);
+    }
+
+
+    const cart = await this.cartModel.find({ userId: user._id }).lean();
+    await this.redisClient.setEX(cacheKey, JSON.stringify(cart), this.CACHE_TTL);
+    return cart;
   }
 
   async getCartByCartId(cartId: string) {
