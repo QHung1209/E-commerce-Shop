@@ -16,7 +16,7 @@ export class UsersController {
   }
 
   @Get()
-  @CheckPolicies((ability: AppAbility) => ability.can(Action.Read, User))
+  @CheckPolicies((ability: AppAbility) => ability.can(Action.Manage, User))
   findAll() {
     return this.usersService.findAll();
   }
@@ -27,11 +27,13 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @CheckPolicies((ability: AppAbility) => ability.can(Action.Update, User))
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
+  @CheckPolicies((ability: AppAbility) => ability.can(Action.Manage, User))
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }

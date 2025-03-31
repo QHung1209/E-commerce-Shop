@@ -41,7 +41,7 @@ export class ProductsService {
   }
 
   async findAllProductByShopId(currentPage: string, pageSize: string, qs: string) {
-    const { filter, sort, projection, population } = aqp(qs)
+    const { filter, sort, population } = aqp(qs)
     delete filter.current;
     delete filter.pageSize;
     console.log(filter)
